@@ -1,0 +1,15 @@
+/*
+ * Copyright (c) 2023 The ZMK Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/ {
+    behaviors {
+        soft_poweroff: behavior_soft_poweroff {
+            compatible = "zmk,behavior-soft-poweroff";
+            label = "soft_poweroff";
+            #binding-cells = <0>;
+        };
+    };
+};
