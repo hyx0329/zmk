@@ -5,4 +5,4 @@
  */
 
 #define LOCKED 0x00
-#define WAKABLE 0x01
+#define SLEEP 0x01

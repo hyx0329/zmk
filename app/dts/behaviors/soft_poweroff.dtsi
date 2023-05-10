@@ -8,16 +8,16 @@
 
 / {
     behaviors {
-        soft_poweroff: behavior_soft_poweroff {
+        /omit-if-no-ref/ soft_poweroff: behavior_soft_poweroff {
             compatible = "zmk,behavior-soft-poweroff";
             label = "SOFT_POWEROFF";
             #binding-cells = <0>;
         };
 
-        sleep: behavior_sleep {
+        /omit-if-no-ref/ sleep: behavior_sleep {
             compatible = "zmk,behavior-soft-poweroff";
             label = "SLEEP";
-            type = <WAKABLE>;
+            type = <SLEEP>;
             #binding-cells = <0>;
         };
     };
