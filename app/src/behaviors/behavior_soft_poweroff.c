@@ -27,13 +27,6 @@ struct behavior_softoff_config {
     int type;
 };
 
-#if IS_ENABLED(CONFIG_ZMK_SLEEP)
-struct zmk_behavior_enter_deep_sleep_work {
-    bool initialized;
-    struct k_work_delayable work;
-} enter_deep_sleep_work = {.initialized = false};
-#endif
-
 static void enter_deep_sleep() {
     // Turn off the system. See `zephyr/samples/boards/nrf/system_off` or `app/src/activity.c`.
     // Equivalent to ACPI S5.
@@ -50,15 +43,11 @@ static void enter_deep_sleep() {
 
 static void enter_deep_sleep_process(struct k_work *item) { enter_deep_sleep(); }
 
-static int behavior_softoff_init(const struct device *dev) {
 #if IS_ENABLED(CONFIG_ZMK_SLEEP)
-    if (!enter_deep_sleep_work.initialized) {
-        enter_deep_sleep_work.initialized = true;
-        k_work_init_delayable(&enter_deep_sleep_work.work, enter_deep_sleep_process);
-    }
+K_WORK_DELAYABLE_DEFINE(enter_deep_sleep_work, enter_deep_sleep_process);
 #endif
-    return 0;
-};
+
+static int behavior_softoff_init(const struct device *dev) { return 0; };
 
 static int on_keymap_binding_released(struct zmk_behavior_binding *binding,
                                       struct zmk_behavior_binding_event event) {
@@ -77,7 +66,7 @@ static int on_keymap_binding_released(struct zmk_behavior_binding *binding,
         // interrupts enabled) limitation: any type before the actual sleep will make it a poweroff
         // behavior how to improve: introduce something to terminate the kscan(but keep the
         // interrupts) after sleep requested
-        k_work_reschedule(&enter_deep_sleep_work.work, K_SECONDS(SLEEP_S));
+        k_work_reschedule(&enter_deep_sleep_work, K_SECONDS(SLEEP_S));
         break;
     default:
         break;
@@ -89,7 +78,7 @@ static int on_keymap_binding_released(struct zmk_behavior_binding *binding,
 
 static const struct behavior_driver_api behavior_softoff_driver_api = {
     .binding_released = on_keymap_binding_released,
-    .locality = BEHAVIOR_LOCALITY_EVENT_SOURCE,
+    .locality = BEHAVIOR_LOCALITY_GLOBAL,
 };
 
 #define SOFTOFF_INST(n)                                                                            \
