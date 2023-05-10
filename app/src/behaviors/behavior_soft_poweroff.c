@@ -71,7 +71,7 @@ static int on_keymap_binding_released(struct zmk_behavior_binding *binding,
         // sleep before kscan interrupts enabled, so keys are locked
         enter_deep_sleep();
         break;
-    case WAKABLE:
+    case SLEEP:
         // sleep after kscan interrupts enabled
         // so the keyboard can be waked up by typing(on platforms with PORT events, gpiote,
         // interrupts enabled) limitation: any type before the actual sleep will make it a poweroff
