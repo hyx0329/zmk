@@ -6,3 +6,8 @@ description: Keyboard System Soft Off Behavior
 compatible: "zmk,behavior-soft-poweroff"
 
 include: zero_param.yaml
+
+properties:
+  type:
+    type: int
+    default: 0

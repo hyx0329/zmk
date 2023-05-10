@@ -4,11 +4,20 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <dt-bindings/zmk/soft_poweroff.h>
+
 / {
     behaviors {
         soft_poweroff: behavior_soft_poweroff {
             compatible = "zmk,behavior-soft-poweroff";
-            label = "soft_poweroff";
+            label = "SOFT_POWEROFF";
+            #binding-cells = <0>;
+        };
+
+        sleep: behavior_sleep {
+            compatible = "zmk,behavior-soft-poweroff";
+            label = "SLEEP";
+            type = <WAKABLE>;
             #binding-cells = <0>;
         };
     };
