@@ -18,11 +18,17 @@
 #define DFU_MAGIC_SKIP 0x6d
 #define _PINNUM(port, pin) ((port)*32 + (pin))
 #define BATTERY_ENABLE _PINNUM(0, 28)
+#define CHARGING_DETECT _PINNUM(0, 3)
 
 static const struct device *p0 = DEVICE_DT_GET(DT_NODELABEL(gpio0));
 
 static inline void power_off(void) {
     nrf_gpio_pin_write(BATTERY_ENABLE, false); // turn off the external power source
+}
+
+static inline bool is_charging(void) {
+    // 0: charging
+    return nrf_gpio_pin_read(CHARGING_DETECT) == 0;
 }
 
 // for multiple tap
@@ -32,11 +38,11 @@ K_WORK_DELAYABLE_DEFINE(perform_button_action_work, perform_button_action);
 #endif
 
 static void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins) {
-    // TODO: use p0.03 to detect external power
-
     // wait the button stable at 0 so the keyboard won't be powered up accidentally
     k_sleep(K_SECONDS(1));
-    power_off();
+    if (!is_charging()) {
+        power_off();
+    }
 
     // TODO: block and drain power
 }
@@ -61,7 +67,7 @@ static int pinmux_nrf52840_m2_init(const struct device *port) {
     nrf_gpio_pin_write(BATTERY_ENABLE, true);
 
     // this is the pin for charging detection
-    gpio_pin_configure(p0, 3, GPIO_INPUT);
+    nrf_gpio_cfg_input(CHARGING_DETECT, NRF_GPIO_PIN_PULLUP);
 
     // setup the interrupts to poweroff the keyboard
     static struct gpio_callback button_cb;
